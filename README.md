@@ -271,7 +271,57 @@ That's a little better!  We still aren't creating anything magical, but it's eas
 
 ### Envelopes and the Synth as an Instrument
 
-Envelope Shit
+Ideally we would like our Synth to play a note and then stop, instead of going on and on forever.  The best tool for this job is something called an Envelope.  Envelopes are created in the following way:
+```
+e = Env.new( [0, 1, 0], [0.02, 1] );
+```
+An envelope takes several arguments, but the two most important ones are the first two: an array of levels and an array of times.  The envelope essentially represents a value which changes over time.  It begins at the first value of the levels array (zero, in this case), and climbs linearly to the second value over a period of time equal to the corresponding value in the times array.  And so on and so forth.  So this envelope starts at 0, climbs to 1 in 0.02 seconds, and then decays back to 0 over 1 second.  This is represented most clearly in a graph – if we plot the envelope, it looks like this:
+
+![4](https://github.com/mlevatich/Introduction-To-SuperCollider/blob/master/Images/4.png)
+
+We can turn our droning synth into a single note by treating the values the envelope takes on as multipliers for the synth's amplitude.  So we begin at volume 0, and then climb to full volume in a very short time (representative of the note's "attack") and then decay over one second as the note fades out.
+
+In order to get our envelope to traverse it's levels in real time as we run the synth, we first need to feed it through a specialized UGen called EnvGen.  So the code which actually generates our amplitude looks like this:
+```
+EnvGen.ar( Env.new( [0, 1, 0], [0.02, 1] ) );
+```
+In our SynthDef, we can multiply each of our overtone SinOsc objects by this EnvGen.  We can think of both the SinOsc and the EnvGen as constantly generating values in real time on the server which match the graphs displayed by .plot, and in that context multiplying them together makes sense – whatever is output by each SinOsc is modified by a factor according to where we are in our envelope.  The new and improved SynthDef, then, looks like this:
+```
+(
+SynthDef(\mySynth, { | freq, amp |
+    var source, freqs, amps;
+    freqs = Array.fill( 10, { arg i; freq * ( i + 1 ) } );
+    amps = Array.fill( 10, { arg i; amp / ( i + 1 ) } );
+    source = Array.fill( 10, { arg i; SinOsc.ar( freq: freqs[i], mul: amps[i] ) * EnvGen.ar( Env.new([0,1,0], [0.02, 1]) ) } );
+    Out.ar( [0, 1], LPF.ar(Mix.ar(source), mul: amp) );
+}).add;
+
+Synth(\mySynth, [freq: 660, amp: 0.2]);
+)
+```
+Playing this will give us something closer to a discrete event in time – a note, as though we had smacked a key on the piano.  Try messing around with the values in the envelope array and see what kind of wacky things you can get the note to do!
+
+We aren't quite out of the woods yet though.  Synths are stored on the server, and they continue to run until they are freed by cmd+period.  That means even if one of our notes is over, and its volume has dropped to 0, it still exists on the server and is still eating up space.  You can actually witness this if you spam cmd+return on the synth and look in the bottom right corner of the IDE: the server % will go up and up until it eventually crashes.
+
+We'd much rather free our synth automatically as soon as its volume drops to zero, i.e. as soon as the envelope ends and the note is over.  That way we'll always have room for more notes.  This is surprisingly easy to do – an additional argument to EnvGen called doneAction gives us the option to trigger an action when the envelope ends.  In order to free the synth, the value we give to that argument is Done.freeSelf.  So our final code is this:
+```
+(
+SynthDef(\mySynth, { | freq, amp |
+    var source, freqs, amps;
+    freqs = Array.fill( 10, { arg i; freq * ( i + 1 ) } );
+    amps = Array.fill( 10, { arg i; amp / ( i + 1 ) } );
+    source = Array.fill( 10, { arg i; SinOsc.ar( freq: freqs[i], mul: amps[i] ) * EnvGen.ar(Env.new([0,1,0], [0.02, 1]), doneAction: Done.freeSelf) } );
+    Out.ar( [0, 1], LPF.ar(Mix.ar(source), mul: amp) );
+}).add;
+
+Synth(\mySynth, [freq: 660, amp: 0.2]);
+)
+```
+Now we know how to use Synths as 'instruments', to which we can give different arguments in order to play different 'notes' on the instrument!  The many UGens of SuperCollider give us virtually infinite degrees of freedom in designing an instrument which plays notes that sound exactly how we want them.  If you're looking for UGens with which you can create some interesting instruments, try checking out the following in the help docs:
+
+WhiteNoise, PinkNoise, BrownNoise, LFPulse, Gverb, CombC, LPF
+
+The natural next step is to ask, now that I have my instrument, how can I write code that plays my instrument in an intelligent and interesting way?  Essentially, how can I write code that makes music?
 
 # Algorithmic Composition
 
