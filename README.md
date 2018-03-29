@@ -51,7 +51,7 @@ myVariable.postln;
 )
 ```
 
-Variables are not strongly typed in SuperCollider, so there's no need to specify a type.  Within the parenthesis, you can do all the normal things you'd expect from a variable.  This 'var' kind of variable is more restrictive than it appears, however.  For example, executing these two lines one after another throws an error:
+Variables are not strongly typed in SuperCollider, so there's no need to specify a type.  Within the parentheses, you can do all the normal things you'd expect from a variable.  This 'var' kind of variable is more restrictive than it appears, however.  For example, executing these two lines one after another throws an error:
 
 ```
 var myVariable = 5;
@@ -82,7 +82,7 @@ Variables with single character names in SuperCollider will behave exactly as yo
 ~myVariable.postln;
 ```
 
-This is as good a time as any to point out that while math in SuperCollider can be done in exactly the same way as in a standard programming language, there is no operator precedence, so equations will always evaluate from left to right unless you use parenthesis.
+This is as good a time as any to point out that while math in SuperCollider can be done in exactly the same way as in a standard programming language, there is no operator precedence, so equations will always evaluate from left to right unless you use parentheses.
 
 ## Functions
 
