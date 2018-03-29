@@ -165,7 +165,7 @@ Neither the .value nor .postln messages are very useful for viewing our output h
 
 One useful feature of SuperCollider is the ability to plot the sound waves you're creating (or anything else, really).  Just replace .play with .plot and a graph will show up that looks something like this:
 
-PIC_1
+![1](https://mlevatich.github.com/Images/1)
 
 It's a sine wave!  No surprises there.  On the other hand, if you want to look at what your sound is doing in real time, few things are easier or more illustrative than a FreqScope.  Just type and execute:
 ```
@@ -173,7 +173,7 @@ FreqScope.new;
 ```
 and then play your SinOsc.  Your FreqScope will react to the sound being played and display the frequencies and amplitudes in real time.  It should look like the below.  Pretty neat!
 
-PIC_2
+![2](https://mlevatich.github.com/Images/2)
 
 ### The Help Docs
 
@@ -181,7 +181,7 @@ The number and variety of functions and messages that are pre-packaged with vani
 
 As an example, let's search for something we're going to want to know how to use: arrays.  Type Array into the editor, click on it, and hit cmd+D.  We immediately see a description that matches up with our standard understanding of arrays, and if we scroll down we can see the various class methods of the Array class, and below that, the instance methods that we can call on existing arrays.  A particularly useful class method will be Array.fill:
 
-PIC_3
+![3](https://mlevatich.github.com/Images/3)
 
 From our understanding of functions and the description and examples provided, it's easy to understand what Array.fill does.  Feel free to mess around with it in your IDE if you want to experiment with its behavior – we'll be using it soon!
 
