@@ -165,7 +165,7 @@ Neither the .value nor .postln messages are very useful for viewing our output h
 
 One useful feature of SuperCollider is the ability to plot the sound waves you're creating (or anything else, really).  Just replace .play with .plot and a graph will show up that looks something like this:
 
-![1](https://github.com/mlevatich/Introduction-To-SuperCollider/Images/1.png)
+![1](https://github.com/mlevatich/Introduction-To-SuperCollider/blob/master/Images/2.png?raw=true)
 
 It's a sine wave!  No surprises there.  On the other hand, if you want to look at what your sound is doing in real time, few things are easier or more illustrative than a FreqScope.  Just type and execute:
 ```
