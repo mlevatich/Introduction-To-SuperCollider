@@ -7,6 +7,7 @@ Welcome to an introduction to the SuperCollider programming language!  The aim o
 You'll need to know a couple of things coming into this guide. They are:
 - The basics of coding (in some ordinary language – Java, C, Python, etc)
 - What SuperCollider is and what it does
+
 In short, take a look at [this FAQ](https://scacinto.wordpress.com/2014/02/24/intro-to-supercollider-3-for-the-uninitiated/#more-2318) before continuing on, if you're completely new. Download the IDE, open it up, and let's dive in!
 
 # The Basics
