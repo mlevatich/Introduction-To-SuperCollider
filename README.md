@@ -389,11 +389,35 @@ The value which this variable is set to represents the beats per second.
 
 # The Server and Synths as Effects
 
-### Synths and the Client / Server Divide
+### Why are synthDefs so weird?
 
-What does a synthdef actually do?  What does it mean for it to be on the server?
+Back when we were talking about synthDefs I said that I would come back to some of the stranger things about them, like the use of Out.ar, audio buses, and the add message.  All of these oddities basically stem from the fact that synths live on the SuperCollider audio server.  Nothing in this guide so far has hinged upon that distinction, but it's an important thing to understand if one wishes to dive deep into the language.
+
+On the server, a synth is a type of "node".  The server is comprised of these nodes, which can be organized into "groups".  Calling .add on the synthDef then can be thought of as sending the synthDef to the server and assigning it to a node.
+
+Out.ar() is just handling explicitly what convenience functions like .play handle implicitly – sending audio through an audio bus.  In order to really understand this, though, we have to talk about bussing.  Buses are responsible for sending signals from one place to another.  Signals can be sent from a synth to the audio hardware (using 0 and 1 for the left and right speakers, as we've been doing; audio hardware always gets the lowest bus numbers by default), but they can also be sent from synth to synth.  This brings us to our final topic: synths as effects.
 
 ### Synths as Effects
 
-What is a bus?
-How do I make a synth that's an effect?
+Since we can use bussing to send the output of synths not only to the audio hardware but also to other synths, we can generate an audio signal using a synth and then send it to a different synth to further transform it.  Why would we want to do this?  Well, we don't always have to think of a synth as an instrument.  A synth could instead be an effect that applies a transformation to an input signal coming from some bus, and then sends it to the audio hardware.  A synth could apply reverb to an incoming signal, as a simple example:
+```
+~bus = Bus.audio(s, 2);
+
+SynthDef(\some_random_synth, {| args |
+        // Code to generate some signal
+        Out.ar(~bus, signal);
+    }).add;
+
+SynthDef(\verb, {
+        var tones;
+        tones = In.ar(~bus, 2); // Here's where we get our signal from!
+        Out.ar([0,1], GVerb.ar(tones,drylevel:dry));
+}).add;
+```
+Here we create a bus, and our synth sends a signal through that bus, whereupon the reverb synth receives it and applies the transformation.
+
+Using synths as effects offers you more modularity than combining all of your effects into a single instrument – if you create a really cool effect, you can apply it to multiple different instruments in different ways if you keep it in its own synth!
+
+# Bye!
+
+That just about covers the basics of SuperCollider!  Hopefully this guide helped you get on your feet and get started working in this powerful language.  With so many different capabilities to explore, learning SuperCollider is more about exploration than anything else – I only hope this introduction helps to kickstart that process.
