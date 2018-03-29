@@ -74,17 +74,15 @@ This is as good a time as any to point out that while math in SuperCollider can 
 ## Functions
 
 Functions in SuperCollider are reusable pieces of code, as in most languages.  They're created using curly braces, like so:
-
 ```
 ~myFunction = { 'Function evaluated!'.postln; };
 ```
-
 A function can contain any number of lines of code, and once we've stored it, we can evaluate it by referring to its location:
 ```
 ~myFunction.value;
 ```
 We need to call .value on the function because functions are objects.  If you just execute ~myFunction; on its own, SuperCollider will respond back, "yep, that's a function!".  The 'value' message tells SuperCollider to actually evaluate the function.  Typically we would like to evaluate a function as soon as it's ready to go, so a fairly common sight in SuperCollider code is a structure that looks like the following:
-
+```
 (
 ~myFunction = {
     // Do some stuff
@@ -92,13 +90,13 @@ We need to call .value on the function because functions are objects.  If you ju
 
 ~myFunction.value;
 )
-
+```
 If we hit cmd + return anywhere inside the parenthesis, we'll reassign the function to ~myFunction, thus updating it with any changes we've made, and then evaluate it immediately.  A slick alternative to this, if you don't need the function later, is to just evaluate it without assigning it, like so:
-
+```
 { a = 5+6*7; a.postln; }.value;
-
+```
 Functions can also accept arguments.  There are two equivalent ways to write this:
-
+```
 (
 ~myFunction = { arg a, b; (a+b).postln; };
 ~myFunction.value(5, 6);
@@ -108,9 +106,9 @@ Functions can also accept arguments.  There are two equivalent ways to write thi
 ~myFunction = { |a, b| (a+b).postln; };
 ~myFunction.value(5, 6);
 )
-
+```
 Arguments can have default values that will be overwritten only if that argument is provided.  When you take advantage of this (or perhaps always, just to be safe), be sure to refer to the arguments by name when you call the function:
-
+```
 // This will evaluate to 13
 (
 ~myFunction = { |a = 8, b| (a+b).postln; };
@@ -128,18 +126,18 @@ Arguments can have default values that will be overwritten only if that argument
 ~myFunction = { |a = 8, b| (a+b).postln; };
 ~myFunction.value(a: 1, b: 6);
 )
-
+```
 # Generating Sound
 
 ### SinOsc and UGens
 
 At last, time to make some noise!  Type and execute the following lines:
-
+```
 (
 s.boot;
 { SinOsc.ar(freq: 440, mul: 0.5); }.play;
 )
-
+```
 You should hear a constant tone coming from the left speaker.  To be more precise, it's a sine wave with frequency 440 and amplitude 0.5, as we've specified by our arguments to SinOsc.ar.  SinOsc.ar is called a Unit Generator, or UGen.  A UGen is just an object that processes or generates sound, and SuperCollider has tons of different kinds.  SinOsc is the simplest one, and the .ar signifies that the UGen runs at audio rate.  We can also write UGen.kr to get a UGen that runs at control rate.  All UGens need to send either the ar or kr message to actually process/generate sound.  Just like how we provide arguments to our function ~myFunction.value(args), we provide named arguments to the SinOsc.ar that specify its behavior (in general, SuperCollider will helpfully tell you the arguments that a function accepts if you begin typing some in the parentheses).  The UGen created with the specified arguments is wrapped in a function using the familiar curly brace notation, and the .play message is sent to that function.  The .value message won't do anything for us here besides identify the SinOsc as a UGen – we need .play in order to actually interact with SuperCollider's audio server.  The play message isn't rigidly defined, depending on what you're using it on, but it generally means about what you'd expect: start making noise!
 
 You'll need the s.boot; line beforehand to start SuperCollider's audio server.  You may have noticed already that when you open up SuperCollider, there are two applications running.  One is the IDE you're writing code in, and the other is a powerful audio processing server that receives your commands and is responsible for actually making the noises!  The distinction between the client and the server will become important in due time.
@@ -155,9 +153,9 @@ One useful feature of SuperCollider is the ability to plot the sound waves you'r
 PIC_1
 
 It's a sine wave!  No surprises there.  On the other hand, if you want to look at what your sound is doing in real time, few things are easier or more illustrative than a FreqScope.  Just type and execute:
-
+```
 FreqScope.new;
-
+```
 and then play your SinOsc.  Your FreqScope will react to the sound being played and display the frequencies and amplitudes in real time.  It should look like the below.  Pretty neat!
 
 PIC_2
@@ -177,7 +175,7 @@ From our understanding of functions and the description and examples provided, i
 ### Ok, so I have all of these tools.  How do I make an instrument?
 
 ...Is the question you should be asking yourself right about now.  Never fear!  With the knowledge we've built so far, we're not far off from making all kinds of instruments.  More precisely, we'll be defining a Synth which we store on the server and can play repeatedly.  Here's what a SynthDef looks like in the editor:
-
+```
 (
 SynthDef(\mySynth, { | freq, amp |
     var source;
@@ -187,7 +185,7 @@ SynthDef(\mySynth, { | freq, amp |
 
 Synth(\mySynth, [freq: 440, amp: 0.2]);
 )
-
+```
 If you execute this code, it should play the same sine wave from our first SinOsc example.  Let's unpack what's actually happening here.
 
 The SynthDef takes in two arguments.  The first is a name for the Synth, which is always preceded by a backslash.  The second argument is a function which begins running when the Synth is called, as in the 8th line in this example.  When we call the Synth, we identify it by name and then supply an argument array for the SynthDef's function, as I have here (freq and amp).  In this particular case, our function assigns a SinOsc with frequency and amplitude given by the arguments to a variable called source.  That source is then passed to an Out UGen with first argument 0.  We haven't seen Out.ar before, but suffice it to say that it accepts some audio as the second argument and outputs it through the "bus" specified by the first argument.  The 0th bus happens to be the left speaker, which is why the sound plays from the left speaker.  Finally, we call "add" on the entire SynthDef.
@@ -199,34 +197,34 @@ First of all, let's get our audio going to both speakers, not just the left one.
 How can we make our sound more interesting than a simple sine wave?  A good place to start is with overtones – physical instruments create additional "overtones" whenever any one note is played, so if we want our synth to sound more "real", we can give it some overtones.
 
 First, we add a variable 'freqs' to our SynthDef, which will be an array containing the frequencies of both the played tone and all of its overtones:
-
+```
 SynthDef(\mySynth, { | freq, amp |
     var source, freqs;
-
+```
 The most effective way to fill our freqs array is undoubtedly with Array.fill.  The formula for the overtone series of any given note is simply all of the integer multiples of the fundamental frequency.  So our Array.fill will look like this:
-
+```
 // 10 tones should be plenty to achieve the desired effect
 freqs = Array.fill( 10, { arg i; freq * ( i + 1 ) } );
-
+```
 Since i starts from 0, the first element in the array will be the fundamental frequency, followed by its first 9 integer multiples.  Of course, the amplitudes of the overtones will not all be equal.  In fact, they decay according to a formula. Sounds like a job for another array!
-
+```
 SynthDef(\mySynth, { | freq, amp |
     var source, freqs, amps;
-
+```
 A simple formula for amplitudes is the amplitude of our fundamental tone (given by the amp argument) divided by the overtone number:
-
+```
 amps = Array.fill( 10, { arg i; amp / ( i + 1 ) } );
-
+```
 Next, we need to use our frequency and amplitude arrays to create 10 different SinOsc UGens, each representing a different overtone:
-
+```
 SynthDef(\mySynth, { | freq, amp |
     var source, freqs, amps;
     freqs = Array.fill( 10, { arg i; freq * ( i + 1 ) } );
     amps = Array.fill( 10, { arg i; amp / ( i + 1 ) } );
     source = Array.fill( 10, { arg i; SinOsc.ar( freq: freqs[i], mul: amps[i] ) } );
-
+```
 Lastly, we can't send each SinOsc through Out.ar individually – we need to combine them all into one signal.  This is easily accomplished with another UGen, Mix.ar, which serves exactly that purpose:
-
+```
 (
 SynthDef(\mySynth, { | freq, amp |
     var source, freqs, amps;
@@ -238,9 +236,9 @@ SynthDef(\mySynth, { | freq, amp |
 
 Synth(\mySynth, [freq: 440, amp: 0.2]);
 )
-
+```
 Unfortunately, while our overtones do give the sound a certain fullness that it was lacking before, it's also far more aggressive and grating.  Why don't we tone that down with a lowpass filter!
-
+```
 (
 SynthDef(\mySynth, { | freq, amp |
     var source, freqs, amps;
@@ -252,7 +250,7 @@ SynthDef(\mySynth, { | freq, amp |
 
 Synth(\mySynth, [freq: 660, amp: 0.2]);
 )
-
+```
 That's a little better!  We still aren't creating anything magical, but it's easy to see how by compounding UGens on top of each other we can create a more and more complicated sound for our instrument.  Speaking of which, we haven't really been using our Synth like an instrument – we've just been playing it once immediately and letting it drone on until we stop it.  How can we fix that?
 
 ### Envelopes and the Synth as an Instrument
@@ -275,15 +273,3 @@ What does a synthdef actually do?  What does it mean for it to be on the server?
 
 What is a bus?
 How do I make a synth that's an effect?
-
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-
-**Bold** and _Italic_ and `Code` text
-
-![Image](src)
-```
