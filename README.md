@@ -275,7 +275,7 @@ Ideally we would like our Synth to play a note and then stop, instead of going o
 ```
 e = Env.new( [0, 1, 0], [0.02, 1] );
 ```
-An envelope takes several arguments, but the two most important ones are the first two: an array of levels and an array of times.  The envelope essentially represents a value which changes over time.  It begins at the first value of the levels array (zero, in this case), and climbs linearly to the second value over a period of time equal to the corresponding value in the times array.  And so on and so forth.  So this envelope starts at 0, climbs to 1 in 0.02 seconds, and then decays back to 0 over 1 second.  This is represented most clearly in a graph – if we plot the envelope, it looks like this:
+An envelope can take several arguments, but the two most important ones are the first two: an array of levels and an array of times.  The envelope essentially represents a value which changes over time.  It begins at the first value of the levels array (zero, in this case), and climbs linearly to the second value over a period of time equal to the corresponding value in the times array.  And so on and so forth.  So this envelope starts at 0, climbs to 1 in 0.02 seconds, and then decays back to 0 over 1 second.  This is represented most clearly in a graph – if we plot the envelope, it looks like this:
 
 ![4](https://github.com/mlevatich/Introduction-To-SuperCollider/blob/master/Images/4.png)
 
