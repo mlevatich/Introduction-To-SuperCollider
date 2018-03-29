@@ -16,13 +16,13 @@ In short, take a look at [this FAQ](https://scacinto.wordpress.com/2014/02/24/in
 You'll notice there are three parts to the IDE: the post window in the bottom right, the help browser in the top right, and the editor on the left.  We'll be primarily concerned with the editor, since that's where we write code!  Go ahead and copy the below into your editor:
 
 ```
-CODE_EXCERPT 1
+'Hello, World!'.postln;
 ```
 
 Click on the line and hit cmd + return to execute it –  you should see 'Hello, World!' pop up in the post window.  We "posted" it there with postln.  As in most programming languages, single or double quotes identify a string.  The following syntax also works:
 
 ```
-CODE_EXCERPT 2
+postln('Hello, World!');
 ```
 
 If you execute this line in the same way as above, you should see the same results.  SuperCollider is, in general, very syntactically flexible – this can be both a blessing and a curse.  You can pick the style that suits you best, but if you mix and match, your code will become messy and difficult to read!
@@ -30,7 +30,10 @@ If you execute this line in the same way as above, you should see the same resul
 You've probably also noticed that we're able to execute lines of code individually and immediately, rather than having to compile and run an entire program.  For those familiar, SuperCollider is similar to R in this respect.  We can execute multiple lines of code sequentially by surrounding a code block with parenthesis:
 
 ```
-CODE_EXCERPT 3
+(
+'This is a statement...'.postln;
+'...And so is this!'.postln;
+)
 ```
 
 Clicking anywhere inside the parenthesis and hitting cmd + return will execute every statement in the block, one by one.  SuperCollider doesn't really care about whitespace, so long as you provide semicolons to break up individual statements.  So it's up to you to style your code properly!
@@ -42,31 +45,41 @@ You may have noticed that the post window prints '...And so is this!' an additio
 If you're already familiar with general programming practice, by this time you're probably wondering where our variables are.  Variables in SuperCollider come in two types.  The first looks like this:
 
 ```
-CODE_EXCERPT 4
+(
+var myVariable = 5;
+myVariable.postln;
+)
 ```
 
 Variables are not strongly typed in SuperCollider, so there's no need to specify a type.  Within the parenthesis, you can do all the normal things you'd expect from a variable.  This 'var' kind of variable is more restrictive than it appears, however.  For example, executing these two lines one after another throws an error:
 
 ```
-CODE_EXCERPT 6
+var myVariable = 5;
+myVariable.postln;
 ```
 
 Variables declared with 'var' must be anchored to some larger block of code, or else they don't do anything.  Just executing var myVariable = 5; doesn't actually save anything anywhere – and after a code block ends, the 'var' variables inside it disappear and can't be used later.  Additionally, 'var' variables must be declared in the first statement of the code block or function (they can be assigned to anywhere without fear).  Anything else, such as the following, will throw an error:
 
 ```
-CODE_EXCERPT 5
+(
+'hello'.postln;
+var myVariable = 5;
+myVariable.postln;
+)
 ```
 
 You might be thinking at this point that these variables seem awfully useless, which is why SuperCollider gives us a more flexible option:
 
 ```
-CODE_EXCERPT 8
+a = 6;
+a.postln;
 ```
 
 Variables with single character names in SuperCollider will behave exactly as you would expect an ordinary global variable to behave in any other programming language.  They are given to you for free, so they don't need to be declared, and they can be assigned to and used anywhere in your code (the letter 's' is reserved, so don't use that one!).  If you (understandably) don't want to use single-letter variable names, there's one more option; any name with a ~ in front of it will function exactly like a single-letter variable:
 
 ```
-CODE_EXCERPT 9
+~myVariable = 5+6*7;
+~myVariable.postln;
 ```
 
 This is as good a time as any to point out that while math in SuperCollider can be done in exactly the same way as in a standard programming language, there is no operator precedence, so equations will always evaluate from left to right unless you use parenthesis.
